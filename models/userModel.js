@@ -59,13 +59,13 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.pre(/^find/, function (next) {
-  this.populate({
-    path: "farms",
-    populate: { path: "sensorReadings" }, // Populate farms and their sensor readings
-  });
-  next();
-});
+// userSchema.pre(/^find/, function (next) {
+//   this.populate({
+//     path: "farms",
+//     populate: { path: "sensorReadings" }, // Populate farms and their sensor readings
+//   });
+//   next();
+// });
 userSchema.pre("save", async function (next) {
   //only run this if password was modified
   //in case of new user, password is considered modified

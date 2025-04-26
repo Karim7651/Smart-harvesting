@@ -1,12 +1,12 @@
 import express from "express";
-import { createSensorReading, getSensorReadings } from "../controllers/sensorReadingController.js"; // Import the controller functions
+import { addPicture, getSensorReadings } from "../controllers/sensorReadingController.js";
+import upload from "../utils/s3Upload.js";
+import apiKeyMiddleware from "../controllers/apiKeyMiddleware.js";
 
 const router = express.Router();
 
-// POST route to add sensor reading to a specific farm
-router.post("/:farmId", createSensorReading);
+router.post("/picture",apiKeyMiddleware,upload.single("image"),addPicture);
 
-// GET route to get all sensor readings for a specific farm
 router.get("/:farmId", getSensorReadings);
 
 export default router;

@@ -23,19 +23,22 @@ export const getFarm = async (req, res) => {
 
 export const createFarm = async (req, res) => {
   try {
-    // Step 1: Create the farm
-    const farm = await Farm.create(req.body);
+    // Call the static method on Farm model
+    const { farm, plainApiKey } = await Farm.createFarmWithApiKey(req.body);
 
-    // Step 2: Add the farm to the user's farms array
-    const user = await User.findByIdAndUpdate(
+    // Add the farm to the user's farms array
+    await User.findByIdAndUpdate(
       req.user._id,
-      { $push: { farms: farm._id } }, // Use $push to add the farm to the user's farms array
-      { new: true } // Return the updated user document
+      { $push: { farms: farm._id } },
+      { new: true }
     );
 
     res.status(201).json({
       status: "success",
-      data: { farm },
+      data: {
+        farm,
+        apiKey: plainApiKey, // Only returned once
+      },
     });
   } catch (err) {
     res.status(400).json({

@@ -1,49 +1,44 @@
-import SensorReading from "../models/sensorReadingModel.js"; // Import SensorReading model
-import Farm from "../models/farmModel.js"; // Import Farm model
+import SensorReading from "../models/sensorReadingModel.js";
+import Farm from "../models/farmModel.js";
+import catchAsync from "../utils/catchAsync.js";
+import { uploadToS3 } from "../utils/s3Upload.js"; 
 
-// Controller to add sensor readings to a specific farm
-export const createSensorReading = async (req, res) => {
-  try {
-    const { farmId } = req.params;
-
-    // Check if the farm exists
-    const farm = await Farm.findById(farmId);
-    if (!farm) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Farm not found",
-      });
-    }
-
-    // Create a new sensor reading and associate it with the farm
-    const sensorReading = new SensorReading({
-      temperature: req.body.temperature,
-      humidity: req.body.humidity,
-      pH: req.body.pH,
-      moisture: req.body.moisture,
-      farm: farmId,
-    });
-
-    await sensorReading.save();
-
-    res.status(201).json({
-      status: "success",
-      data: { sensorReading },
-    });
-  } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
+export const addPicture = catchAsync(async (req, res) => {
+  // Ensure that we have a file
+  if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded" });
   }
-};
 
-// Controller to get all sensor readings for a specific farm
-export const getSensorReadings = async (req, res) => {
+  // API key validation has already been done by apiKeyMiddleware
+
+  // Upload the file to S3
+  const uploadResult = await uploadToS3(req.file);  // Upload to S3 using the uploadToS3 function
+  const imageUrl = uploadResult.Location;  // Get the URL of the uploaded image
+
+  // Find the farm using API key (since farmId is not required)
+  const farm = await Farm.findFarmByApiKey(req.headers.apikey);
+  if (!farm) {
+    return res.status(404).json({ message: "Farm not found" });
+  }
+
+  // Create a new sensor reading with the image URL
+  const newReading = new SensorReading({
+    farm: farm._id,
+    imageURL: imageUrl,
+  });
+
+  await newReading.save(); // Save the new sensor reading
+
+  return res.status(201).json({
+    message: "Sensor reading and image uploaded successfully",
+    data: newReading,
+  });
+});
+
+
+export const getSensorReadings = catchAsync( async(req, res) => {
   try {
     const { farmId } = req.params;
-
-    // Fetch sensor readings associated with the farm
     const sensorReadings = await SensorReading.find({ farm: farmId });
 
     if (sensorReadings.length === 0) {
@@ -63,4 +58,4 @@ export const getSensorReadings = async (req, res) => {
       message: err.message,
     });
   }
-};
+});
