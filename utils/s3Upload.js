@@ -16,7 +16,7 @@ const s3 = new S3Client({
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
-export const uploadToS3 = catchAsync(async (file) => {
+export const uploadToS3 = async (file) => {
   console.log("uploading image ....")
   try {
     const uploadParams = {
@@ -33,6 +33,6 @@ export const uploadToS3 = catchAsync(async (file) => {
     console.error("Error uploading to S3", error);
     throw new Error("Failed to upload file to S3");
   }
-});
+};
 
 export default upload;
