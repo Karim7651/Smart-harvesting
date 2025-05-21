@@ -1,4 +1,4 @@
-name: Deploy to Goggle App Engine (GAE)
+name: Deploy to Google App Engine (GAE)
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Setup Node.js and yarn
+      - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '22'
@@ -24,18 +24,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Node Project
-        run: npm run build
+      # Remove this build step because you don't have a build script
+      # - name: Build Node Project
+      #   run: npm run build
 
       - name: Google Cloud Auth
-        uses: 'google-github-actions/auth@v2'
+        uses: google-github-actions/auth@v2
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Set up Cloud SDK
-        uses: 'google-github-actions/setup-gcloud@v2'
+        uses: google-github-actions/setup-gcloud@v2
 
       - name: Deploy to Google App Engine
-        run: |
-          gcloud app deploy app.yaml --quiet
+        run: gcloud app deploy app.yaml --quiet
