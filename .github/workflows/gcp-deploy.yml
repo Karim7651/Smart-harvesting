@@ -22,10 +22,10 @@ jobs:
           node-version: '22'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: npm ci
 
       - name: Build Node Project
-        run: yarn build
+        run: npm run build
 
       - name: Google Cloud Auth
         uses: 'google-github-actions/auth@v2'
