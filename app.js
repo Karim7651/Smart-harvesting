@@ -16,12 +16,17 @@ import sensorReadingRoutes from "./routes/sensorReadingRoutes.js";
 import globalErrorHandler from "./controllers/errorController.js";
 import AppError from "./utils/appError.js";
 const app = express();
+const allowedOrigins = ['https://smart-harvesting-app.vercel.app'];
+
 const corsOptions = {
   origin: (origin, callback) => {
-    // Allow all origins
-    callback(null, origin || '*');
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, origin);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
   },
-  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  credentials: true,
 };
 //1) global middlewares
 //Implement CORS(Headers)
