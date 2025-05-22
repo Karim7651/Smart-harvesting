@@ -24,7 +24,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-
       - name: Google Cloud Auth
         uses: google-github-actions/auth@v2
         with:
@@ -33,6 +32,29 @@ jobs:
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
+
+      - name: Generate config.env file from secrets
+        run: |
+          echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> config.env
+          echo "PORT=${{ secrets.PORT }}" >> config.env
+
+          echo "DATABASE=${{ secrets.DATABASE }}" >> config.env
+          echo "DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}" >> config.env
+          echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> config.env
+
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> config.env
+          echo "JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}" >> config.env
+          echo "JWT_COOKIE_EXPIRES_IN=${{ secrets.JWT_COOKIE_EXPIRES_IN }}" >> config.env
+
+          echo "EMAIL_USERNAME=${{ secrets.EMAIL_USERNAME }}" >> config.env
+          echo "EMAIL_APP_PASSWORD=${{ secrets.EMAIL_APP_PASSWORD }}" >> config.env
+
+          echo "FRONT=${{ secrets.FRONT }}" >> config.env
+
+          echo "AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}" >> config.env
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> config.env
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> config.env
+          echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> config.env
 
       - name: Deploy to Google App Engine
         run: gcloud app deploy app.yaml --quiet

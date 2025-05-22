@@ -31,66 +31,66 @@ const server = app.listen(port, () => {
 });
 
 
-const topic = 'sensorReadings';
+// const topic = 'sensorReadings';
 
-const mqttOptions = {
-  host: process.env.MQTT_HOST,
-  port: 8883,
-  protocol: 'mqtts',
-  username: process.env.MQTT_USER,
-  password: process.env.MQTT_PASSWORD
-};
+// const mqttOptions = {
+//   host: process.env.MQTT_HOST,
+//   port: 8883,
+//   protocol: 'mqtts',
+//   username: process.env.MQTT_USER,
+//   password: process.env.MQTT_PASSWORD
+// };
 
-const client = mqtt.connect(mqttOptions);
+// const client = mqtt.connect(mqttOptions);
 
-client.on('connect', () => {
-  console.log('Connected to MQTT broker');
+// client.on('connect', () => {
+//   console.log('Connected to MQTT broker');
 
-  client.subscribe(topic, (err) => {
-    if (err) {
-      console.error('Failed to subscribe:', err);
-    } else {
-      console.log(`Subscribed to topic: ${topic}`);
-    }
-  });
-});
+//   client.subscribe(topic, (err) => {
+//     if (err) {
+//       console.error('Failed to subscribe:', err);
+//     } else {
+//       console.log(`Subscribed to topic: ${topic}`);
+//     }
+//   });
+// });
 //find if farm exists and then store data
 //apiKey in body with readings
-client.on("message", async (topic, message) => {
-  try {
-    const data = JSON.parse(message.toString());
+// client.on("message", async (topic, message) => {
+//   try {
+//     const data = JSON.parse(message.toString());
 
-    const { apiKey, temperature, humidity, moisture, region, pH, } = data;
-    if(!apiKey){
-      return;
-    }
-    const farm = await Farm.findFarmByApiKey(apiKey);
-    console.log(farm)
-    if (!farm) {
-      console.error("Invalid API key: Farm not found");
-      return;
-    }
+//     const { apiKey, temperature, humidity, moisture, region, pH, } = data;
+//     if(!apiKey){
+//       return;
+//     }
+//     const farm = await Farm.findFarmByApiKey(apiKey);
+//     console.log(farm)
+//     if (!farm) {
+//       console.error("Invalid API key: Farm not found");
+//       return;
+//     }
 
-    await SensorReading.create({
-      farm: farm._id,
-      temperature,
-      humidity,
-      moisture,
-      region,
-      pH,
-      Diseases,
-      isRipe,
-    });
+//     await SensorReading.create({
+//       farm: farm._id,
+//       temperature,
+//       humidity,
+//       moisture,
+//       region,
+//       pH,
+//       Diseases,
+//       isRipe,
+//     });
 
-    console.log("Sensor reading saved");
-  } catch (err) {
-    console.error("Error processing MQTT message:", err.message);
-  }
-});
+//     console.log("Sensor reading saved");
+//   } catch (err) {
+//     console.error("Error processing MQTT message:", err.message);
+//   }
+// });
 
-client.on('error', (err) => {
-  console.error('MQTT error:', err);
-});
+// client.on('error', (err) => {
+//   console.error('MQTT error:', err);
+// });
 
 
 process.on("unhandledRejection", (err) => {
