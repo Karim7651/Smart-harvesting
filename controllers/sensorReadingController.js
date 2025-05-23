@@ -64,22 +64,29 @@ export const getSensorReadingsByFarm = catchAsync(async (req, res) => {
   const { farmId } = req.params;
   const user = req.user; // full user object
 
-  // Check if farmId is in user's farms array
   if (!user.farms || !user.farms.includes(farmId)) {
     return res.status(403).json({ status: "fail", message: "Access denied: Farm not associated with user" });
   }
 
-  // Base query filtered by farmId
-  let query = SensorReading.find({ farm: farmId });
+  // Base filter
+  const filter = { farm: farmId };
 
-  // Apply API features
+  // Count total docs matching the filter (ignoring pagination)
+  const totalDocsPromise = SensorReading.countDocuments(filter);
+
+  // Build the query with API features (filter, sort, fields, paginate)
+  let query = SensorReading.find(filter);
   const features = new APIFeatures(query, req.query)
     .filter()
     .sort()
     .limitFields()
     .paginate();
 
-  const sensorReadings = await features.query;
+  // Run count and query in parallel
+  const [totalDocs, sensorReadings] = await Promise.all([
+    totalDocsPromise,
+    features.query,
+  ]);
 
   if (sensorReadings.length === 0) {
     return res.status(404).json({
@@ -88,10 +95,17 @@ export const getSensorReadingsByFarm = catchAsync(async (req, res) => {
     });
   }
 
+  const limit = req.query.limit ? parseInt(req.query.limit) : 10;
+  const page = req.query.page ? parseInt(req.query.page) : 1;
+
   res.status(200).json({
     status: "success",
     results: sensorReadings.length,
+    totalDocs,
+    totalPages: Math.ceil(totalDocs / limit),
+    currentPage: page,
     data: { sensorReadings },
   });
 });
+
 
