@@ -16,7 +16,7 @@ import sensorReadingRoutes from "./routes/sensorReadingRoutes.js";
 import globalErrorHandler from "./controllers/errorController.js";
 import AppError from "./utils/appError.js";
 const app = express();
-const allowedOrigins = ['https://smart-harvesting-app.vercel.app'];
+const allowedOrigins = ['https://smart-harvesting-app.vercel.app','http://localhost:3000'];
 
 const corsOptions = {
   origin: (origin, callback) => {
