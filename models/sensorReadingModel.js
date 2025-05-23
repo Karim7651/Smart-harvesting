@@ -31,7 +31,10 @@ const sensorReadingSchema = new mongoose.Schema({
   },
   
 });
-
+sensorReadingSchema.pre("find", function (next) {
+  this.populate("farm", "name"); // populate only the 'name' field from Farm
+  next();
+});
 //faster query
 //i didn't index timestamp as this will give a hit on performance (write heavy database)
 sensorReadingSchema.index({ farm: 1 });
