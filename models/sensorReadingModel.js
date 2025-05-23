@@ -32,7 +32,8 @@ const sensorReadingSchema = new mongoose.Schema({
   
 });
 
-// Create an index on the 'farm' field for faster querying
+//faster query
+//i didn't index timestamp as this will give a hit on performance (write heavy database)
 sensorReadingSchema.index({ farm: 1 });
 
 const SensorReading = mongoose.model("SensorReading", sensorReadingSchema);
