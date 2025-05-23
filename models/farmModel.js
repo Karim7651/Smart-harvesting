@@ -17,6 +17,11 @@ const farmSchema = new mongoose.Schema({
     select: false,
     index: true,
   },
+  regions: [{
+  number: Number,
+  name: String,
+  description: String
+}],
 });
 
 //don't store plain api key
@@ -28,7 +33,7 @@ farmSchema.statics.createFarmWithApiKey = async function (farmData) {
     ...farmData,
     apiKey: hashedKey,
   });
-
+  farm.apiKey = undefined
   return { farm, plainApiKey: rawKey };
 };
 

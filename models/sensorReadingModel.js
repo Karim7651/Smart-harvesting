@@ -27,7 +27,9 @@ const sensorReadingSchema = new mongoose.Schema({
   },
   imageURL:{
     type:String,
+    select:false,
   },
+  
 });
 
 // Create an index on the 'farm' field for faster querying

@@ -1,8 +1,9 @@
 import SensorReading from "../models/sensorReadingModel.js";
 import Farm from "../models/farmModel.js";
+import User from "../models/userModel.js"
 import catchAsync from "../utils/catchAsync.js";
 import { uploadToS3 } from "../utils/s3Upload.js"; 
-
+import APIFeatures from "../utils/apiFeatures.js";
 export const addPicture = catchAsync(async (req, res) => {
   // Ensure that we have a file
   if (!req.file) {
@@ -59,3 +60,38 @@ export const getSensorReadings = catchAsync( async(req, res) => {
     });
   }
 });
+export const getSensorReadingsByFarm = catchAsync(async (req, res) => {
+  const { farmId } = req.params;
+  const user = req.user; // full user object
+
+  // Check if farmId is in user's farms array
+  if (!user.farms || !user.farms.includes(farmId)) {
+    return res.status(403).json({ status: "fail", message: "Access denied: Farm not associated with user" });
+  }
+
+  // Base query filtered by farmId
+  let query = SensorReading.find({ farm: farmId });
+
+  // Apply API features
+  const features = new APIFeatures(query, req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+
+  const sensorReadings = await features.query;
+
+  if (sensorReadings.length === 0) {
+    return res.status(404).json({
+      status: "fail",
+      message: "No sensor readings found for this farm",
+    });
+  }
+
+  res.status(200).json({
+    status: "success",
+    results: sensorReadings.length,
+    data: { sensorReadings },
+  });
+});
+
