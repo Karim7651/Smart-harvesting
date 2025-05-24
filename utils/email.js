@@ -10,7 +10,7 @@ export const sendEmail = async (options) => {
     },
   });
   const mailOptions = {
-    from: "E-Commerce <no-reply@ecommerce.com>", 
+    from: "Smart-Harvesting<no-reply@ecommerce.com>", 
     to: options.to,
     subject: options.subject,
     text: options.text,
